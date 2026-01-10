@@ -15,9 +15,9 @@ public class ProgramSettings
 
 
     // Logic to get full paths
-    public string PathPKHeX => GetRepoPath(RepoPKHeXLegality);
-    public string PathRepoEvGal => GetRepoPath(RepoNameEvGal);
-    public string PathRepoPGET => GetRepoPath(RepoNamePGET);
+    [JsonIgnore] public string PathPKHeX => GetRepoPath(RepoPKHeXLegality);
+    [JsonIgnore] public string PathRepoEvGal => GetRepoPath(RepoNameEvGal);
+    [JsonIgnore] public string PathRepoPGET => GetRepoPath(RepoNamePGET);
 
     private string GetRepoPath(string repoName)
     {

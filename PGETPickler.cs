@@ -6,18 +6,6 @@ public class PGETPickler(string PathPKHeXLegality, string PathRepoPGET)
 {
     public void Update()
     {
-        var exe = PathRepoPGET;
-        if (!File.Exists(exe))
-        {
-            // find the first file with exe extension in the folder
-            exe = Directory.EnumerateFiles(PathRepoPGET, "*.exe", SearchOption.AllDirectories).FirstOrDefault(z => z.Contains("WinForms"));
-            if (exe is null)
-            {
-                LogUtil.Log("PGET executable not found");
-                return;
-            }
-        }
-
         if (!RepoUpdater.UpdateRepo("pget", PathRepoPGET, "main"))
             return;
 
@@ -26,6 +14,21 @@ public class PGETPickler(string PathPKHeXLegality, string PathRepoPGET)
         {
             LogUtil.Log("Failed to build PGET repo with msbuild");
             return;
+        }
+
+        var exe = PathRepoPGET;
+        if (!File.Exists(exe)) // not overridden in config (why would you?) -- detect the built exe path
+        {
+            // find the first file with exe extension in the folder -- ensure latest modified exe just in case multiple build targets exist
+            var possible = Directory.EnumerateFiles(PathRepoPGET, "*.exe", SearchOption.AllDirectories)
+                .Where(z => Path.GetFileNameWithoutExtension(z).StartsWith("PoGoEncTool"))
+                .OrderByDescending(z => new FileInfo(z).LastWriteTimeUtc);
+            exe = possible.FirstOrDefault();
+            if (exe is null)
+            {
+                LogUtil.Log("PGET executable not found");
+                return;
+            }
         }
 
         if (!GetIsModified(exe, out var date))
@@ -79,7 +82,7 @@ public class PGETPickler(string PathPKHeXLegality, string PathRepoPGET)
         try
         {
             // Prefer solution file, else fall back to first project file.
-            var sln = Directory.EnumerateFiles(repoPath, "*.sln", SearchOption.AllDirectories).FirstOrDefault();
+            var sln = Directory.EnumerateFiles(repoPath, "*.slnx", SearchOption.AllDirectories).FirstOrDefault();
             var target = sln ?? Directory.EnumerateFiles(repoPath, "*.csproj", SearchOption.AllDirectories).FirstOrDefault();
             if (target is null)
             {

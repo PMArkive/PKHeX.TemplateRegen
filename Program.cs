@@ -11,13 +11,17 @@ var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
 config.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, logconsole);
 NLog.LogManager.Configuration = config;
 
-if (RunUpdate(Assembly.GetEntryAssembly()!.Location)) 
+if (RunUpdate(Assembly.GetEntryAssembly()!.Location))
     Console.WriteLine("Done!");
+else
+    Console.WriteLine("Update not run. Please ensure setup is complete before running this program.");
 
+Console.WriteLine();
+Console.WriteLine("Press any key to quit :)");
 Console.ReadKey();
 return;
 
-bool RunUpdate(string localPath)
+static bool RunUpdate(string localPath)
 {
     var localDir = Path.GetDirectoryName(localPath) ?? string.Empty;
 
